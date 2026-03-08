@@ -112,6 +112,12 @@
 
 > `/api/auth/**`는 인증 불필요. 그 외 `/api/**`는 JWT Bearer 토큰 필요.
 
+**인증 플로우:**
+1. 비로그인 사용자가 접근 시 → 로그인 페이지(`/login`)로 리다이렉트
+2. 로그인/회원가입 성공 시 → JWT 토큰을 `localStorage`에 저장 → 리마인더 홈(`/`)으로 리다이렉트
+3. 이후 모든 API 요청에 `Authorization: Bearer {token}` 헤더 포함
+4. 토큰 만료/유효하지 않은 경우 → 401 응답 → 로그인 페이지로 리다이렉트
+
 ### 3.2 목록 API
 
 | Method | Endpoint | 설명 |
@@ -205,7 +211,9 @@ frontend/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx
-│   │   ├── page.tsx              (대시보드)
+│   │   ├── page.tsx              (리마인더 홈 - 대시보드)
+│   │   ├── login/page.tsx        (로그인)
+│   │   ├── signup/page.tsx       (회원가입)
 │   │   ├── lists/[id]/page.tsx   (목록별 리마인더)
 │   │   ├── today/page.tsx
 │   │   ├── scheduled/page.tsx
@@ -213,7 +221,7 @@ frontend/
 │   │   ├── flagged/page.tsx
 │   │   └── completed/page.tsx
 │   ├── components/
-│   ├── lib/                      (API 클라이언트)
+│   ├── lib/                      (API 클라이언트, 인증 유틸)
 │   └── types/
 ├── package.json
 ├── tailwind.config.ts
