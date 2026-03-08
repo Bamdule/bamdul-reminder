@@ -24,4 +24,13 @@ export interface Reminder {
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+  children: Reminder[];
+}
+
+export interface SmartListCounts {
+  today: number;
+  scheduled: number;
+  all: number;
+  flagged: number;
+  completed: number;
 }

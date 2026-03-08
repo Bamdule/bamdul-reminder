@@ -29,50 +29,48 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-sm p-8 bg-white rounded-xl shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-6">Bamdul Reminder</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              이메일
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="email@example.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              비밀번호
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="8자 이상"
-            />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50"
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
-        </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
+    <div className="min-h-screen flex items-center justify-center bg-bg-primary px-6">
+      <div className="w-full max-w-[340px]">
+        <div className="text-center mb-10">
+          <h1 className="font-rounded text-[32px] font-bold text-text-primary">미리 알림</h1>
+          <p className="text-[14px] text-text-secondary mt-1">로그인하여 시작하세요</p>
+        </div>
+
+        <div className="bg-bg-secondary rounded-2xl overflow-hidden">
+          <form onSubmit={handleSubmit}>
+            <div className="px-4 pt-4 pb-0">
+              <input
+                type="email" value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-0 py-3 text-[16px] bg-transparent text-text-primary border-b border-separator focus:outline-none placeholder:text-text-tertiary"
+                placeholder="이메일"
+              />
+              <input
+                type="password" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-0 py-3 text-[16px] bg-transparent text-text-primary border-b border-separator focus:outline-none placeholder:text-text-tertiary"
+                placeholder="비밀번호"
+              />
+            </div>
+            {error && (
+              <p className="text-[13px] text-system-red px-4 pt-3">{error}</p>
+            )}
+            <div className="p-4">
+              <button
+                type="submit" disabled={loading}
+                className="w-full py-3 bg-system-blue text-white text-[16px] font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-apple"
+              >
+                {loading ? "로그인 중..." : "로그인"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-[14px] text-text-secondary">
           계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-blue-500 hover:underline">
+          <Link href="/signup" className="text-system-blue font-medium">
             회원가입
           </Link>
         </p>
