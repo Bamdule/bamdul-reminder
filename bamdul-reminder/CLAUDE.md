@@ -4,14 +4,16 @@
 - 기능 추가/수정 시 반드시 테스트 코드를 함께 작성한다
 - 테스트는 먼저 실패를 확인한 후 구현하는 것을 권장한다
 
-### 패키지 구조
-- `domain/` - 엔티티, enum (entity 패키지 사용하지 않음)
-- `repository/` - Spring Data JPA Repository
-- `service/port/in/` - Service 인터페이스
-- `service/` - Service 구현 클래스 (`Default` 접두사, 예: `DefaultReminderListService`)
-- `service/dto/` - 서비스 입출력 객체 (Command: 요청, Result: 응답), `@Valid`/`@NotBlank` 등 검증 어노테이션 허용
-- `controller/` - REST API 컨트롤러, 기본적으로 `service/dto/`를 직접 사용
-- `controller/dto/` - API 스펙이 서비스 DTO와 다를 경우에만 별도 생성 (Request/Response)
+### 패키지 구조 (도메인별)
+- `{도메인}/domain/` - 엔티티, enum
+- `{도메인}/repository/` - Spring Data JPA Repository
+- `{도메인}/service/port/in/` - Service 인터페이스
+- `{도메인}/service/` - Service 구현 클래스 (`Default` 접두사, 예: `DefaultReminderListService`)
+- `{도메인}/service/dto/` - 서비스 입출력 객체 (Command: 요청, Result: 응답), `@Valid`/`@NotBlank` 등 검증 어노테이션 허용
+- `{도메인}/controller/` - REST API 컨트롤러, 기본적으로 `service/dto/`를 직접 사용
+- `{도메인}/controller/dto/` - API 스펙이 서비스 DTO와 다를 경우에만 별도 생성 (Request/Response)
+- `global/exception/` - 전역 예외 처리
+- 현재 도메인: `auth/`, `reminderlist/`
 
 ### 테스트
 - domain 엔티티 테스트는 순수 unit test (JPA/Spring Context 의존 없이)
