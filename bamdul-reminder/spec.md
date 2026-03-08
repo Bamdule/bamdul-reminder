@@ -34,11 +34,24 @@
 
 ## 2. 데이터 모델
 
-### 2.1 ReminderList (목록)
+### 2.1 Member (회원)
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | id | Long (PK) | 자동 생성 |
+| email | String (unique) | 이메일 |
+| password | String | 비밀번호 (BCrypt 암호화) |
+| name | String | 이름 |
+| createdAt | LocalDateTime | 생성일시 |
+| updatedAt | LocalDateTime | 수정일시 |
+
+### 2.2 ReminderList (목록)
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | Long (PK) | 자동 생성 |
+| member | Member (FK) | 소속 회원 (개인 모드) |
+| group | ReminderGroup (FK, nullable) | 소속 그룹 (그룹 모드, null이면 개인) |
 | name | String | 목록 이름 |
 | color | String | HEX 색상 코드 (예: #FF6B6B) |
 | icon | String | 아이콘 이름 |
@@ -46,7 +59,29 @@
 | createdAt | LocalDateTime | 생성일시 |
 | updatedAt | LocalDateTime | 수정일시 |
 
-### 2.2 Reminder (리마인더)
+### 2.3 ReminderGroup (그룹)
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | Long (PK) | 자동 생성 |
+| name | String | 그룹 이름 |
+| owner | Member (FK) | 그룹 대표 |
+| createdAt | LocalDateTime | 생성일시 |
+| updatedAt | LocalDateTime | 수정일시 |
+
+### 2.4 GroupMember (그룹원)
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | Long (PK) | 자동 생성 |
+| group | ReminderGroup (FK) | 소속 그룹 |
+| member | Member (FK) | 회원 |
+| permission | enum (READ, READ_WRITE) | 그룹 내 권한 |
+| joinedAt | LocalDateTime | 가입일시 |
+
+> **unique 제약**: (group, member) 조합은 유일해야 한다.
+
+### 2.5 Reminder (리마인더)
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -68,7 +103,16 @@
 
 ## 3. API 설계
 
-### 3.1 목록 API
+### 3.1 인증 API
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | /auth/signup | 회원가입 (email, password, name) → token + member |
+| POST | /auth/login | 로그인 (email, password) → token + member |
+
+> `/api/auth/**`는 인증 불필요. 그 외 `/api/**`는 JWT Bearer 토큰 필요.
+
+### 3.2 목록 API
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
@@ -78,7 +122,7 @@
 | DELETE | /lists/{id} | 목록 삭제 |
 | PATCH | /lists/reorder | 목록 순서 변경 |
 
-### 3.2 리마인더 API
+### 3.3 리마인더 API
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
@@ -89,7 +133,20 @@
 | PATCH | /reminders/{id}/toggle | 완료 토글 |
 | PATCH | /reminders/reorder | 리마인더 순서 변경 |
 
-### 3.3 스마트 목록 API
+### 3.4 그룹 API (P2)
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | /groups | 그룹 생성 |
+| GET | /groups | 내가 속한 그룹 목록 조회 |
+| PUT | /groups/{id} | 그룹 수정 (대표만) |
+| DELETE | /groups/{id} | 그룹 삭제 (대표만) |
+| POST | /groups/{id}/members | 그룹원 초대 (대표만) |
+| DELETE | /groups/{id}/members/{memberId} | 그룹원 강퇴 (대표만) |
+| PATCH | /groups/{id}/members/{memberId}/permission | 그룹원 권한 변경 (대표만) |
+| GET | /groups/{id}/lists | 그룹 목록 조회 |
+
+### 3.5 스마트 목록 API
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
@@ -107,24 +164,39 @@
 
 ```
 src/main/java/bamdul/ai/reminder/
-├── domain/
-│   ├── Reminder.java
-│   ├── ReminderList.java
-│   └── Priority.java
-├── repository/
-│   ├── ReminderRepository.java
-│   └── ReminderListRepository.java
-├── service/
-│   ├── ReminderService.java
-│   └── ReminderListService.java
-├── controller/
-│   ├── ReminderController.java
-│   └── ReminderListController.java
-├── dto/
-│   ├── ReminderDto.java
-│   └── ReminderListDto.java
+├── auth/
+│   ├── controller/        AuthController
+│   ├── domain/            Member
+│   ├── exception/         DuplicateEmailException
+│   ├── repository/        MemberRepository
+│   ├── security/          JwtTokenProvider, JwtAuthenticationFilter, SecurityConfig
+│   └── service/
+│       ├── port/in/       AuthService
+│       ├── dto/           SignupCommand, LoginCommand, AuthResult, MemberResult
+│       └── DefaultAuthService
+├── reminderlist/
+│   ├── controller/        ReminderListController
+│   ├── domain/            ReminderList
+│   ├── repository/        ReminderListRepository
+│   └── service/
+│       ├── port/in/       ReminderListService
+│       ├── dto/           CreateReminderListCommand, UpdateReminderListCommand,
+│       │                  ReminderListResult, ReorderCommand
+│       └── DefaultReminderListService
+├── group/                         (P2 - 엔티티만 선설계)
+│   ├── controller/        GroupController
+│   ├── domain/            ReminderGroup, GroupMember, GroupPermission
+│   ├── repository/        ReminderGroupRepository, GroupMemberRepository
+│   └── service/
+│       ├── port/in/       GroupService
+│       ├── dto/           CreateGroupCommand, GroupResult, ...
+│       └── DefaultGroupService
+├── global/
+│   └── exception/         GlobalExceptionHandler, ResourceNotFoundException
 └── BamdulReminderApplication.java
 ```
+
+> **패키지 규칙**: 도메인별(`{도메인}/`) 하위에 `domain/`, `repository/`, `service/`, `controller/` 등을 배치한다. Service 구현 클래스는 `Default` 접두사를 사용하고, DTO는 `service/dto/`에 Command(요청)/Result(응답)로 구분한다. 전역 공통 클래스는 `global/`에 배치한다.
 
 ### 4.2 Frontend
 
@@ -162,3 +234,4 @@ frontend/
 | 4 | 스마트 목록 API + 프론트엔드 페이지 + 대시보드 | P0 |
 | 5 | 하위 리마인더 + 드래그 앤 드롭 정렬 | P1 |
 | 6 | 반응형, 다크 모드, 검색, 키보드 단축키, 애니메이션 | P2 |
+| 7 | 그룹 리마인더 (그룹 CRUD, 그룹원 초대/강퇴, 권한 관리) | P2 |

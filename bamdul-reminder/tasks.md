@@ -5,29 +5,37 @@
 ## Phase 1: Backend 기본 구조 + 리마인더 CRUD
 
 ### 1.1 프로젝트 설정
-- [ ] `application.properties` H2 DB 설정 (콘솔 활성화, DDL auto, 데이터소스 URL)
-- [ ] CORS 설정 클래스 생성 (`localhost:3000` 허용)
+- [x] `application.properties` H2 DB 설정 (콘솔 활성화, DDL auto, 데이터소스 URL)
+- [x] CORS 설정 (`SecurityConfig`에서 `localhost:3000` 허용)
+- [x] 도메인별 패키지 구조 (`auth/`, `reminderlist/`, `global/`)
 
-### 1.2 Domain
+### 1.2 인증 (auth/)
+- [x] `Member` 엔티티
+- [x] `MemberRepository`
+- [x] `AuthService` / `DefaultAuthService` (회원가입, 로그인)
+- [x] `AuthController` (`POST /api/auth/signup`, `POST /api/auth/login`)
+- [x] JWT 인증 (`JwtTokenProvider`, `JwtAuthenticationFilter`, `SecurityConfig`)
+- [x] `DuplicateEmailException`
+- [x] Auth DTOs (`SignupCommand`, `LoginCommand`, `AuthResult`, `MemberResult`)
+
+### 1.3 목록 (reminderlist/)
 - [x] `ReminderList` 엔티티
+- [x] `ReminderListRepository`
+- [x] `ReminderListService` / `DefaultReminderListService` - 목록 CRUD
+- [x] `ReminderListController` - `GET/POST/PUT/DELETE /api/lists`, `PATCH /api/lists/reorder`
+- [x] List DTOs (`CreateReminderListCommand`, `UpdateReminderListCommand`, `ReminderListResult`, `ReorderCommand`)
+
+### 1.4 리마인더 (reminder/ - 미구현)
 - [ ] `Reminder` 엔티티
 - [ ] `Priority` enum (NONE, LOW, MEDIUM, HIGH)
-
-### 1.3 Repository
-- [ ] `ReminderListRepository`
 - [ ] `ReminderRepository` (+ 커스텀 쿼리 메서드)
-
-### 1.4 DTO
-- [ ] `ReminderListDto` (요청/응답용)
-- [ ] `ReminderDto` (요청/응답용)
-
-### 1.5 Service
-- [ ] `ReminderListService` - 목록 CRUD
-- [ ] `ReminderService` - 리마인더 CRUD + 완료 토글
-
-### 1.6 Controller
-- [ ] `ReminderListController` - `GET/POST/PUT/DELETE /api/lists`
+- [ ] `ReminderService` / `DefaultReminderService` - 리마인더 CRUD + 완료 토글
 - [ ] `ReminderController` - `GET/POST /api/lists/{listId}/reminders`, `PUT/DELETE /api/reminders/{id}`, `PATCH /api/reminders/{id}/toggle`
+- [ ] Reminder DTOs
+
+### 1.5 전역 (global/)
+- [x] `GlobalExceptionHandler`
+- [x] `ResourceNotFoundException`
 
 ### 1.7 초기 데이터
 - [ ] `data.sql` 작성 (샘플 목록 2~3개 + 리마인더 5~10개)
@@ -168,3 +176,44 @@
 - [ ] 반응형 각 화면 크기 정상 동작
 - [ ] 다크 모드 전환
 - [ ] 검색 결과 즉시 필터링
+
+---
+
+## Phase 7: 그룹 리마인더
+
+> 엔티티는 선설계하되, 기능 구현은 이 Phase에서 진행한다. 그 전까지는 개인 리마인더(그룹 대표 = 본인)만 사용한다.
+
+### 7.1 엔티티 선설계 (Phase 1에서 미리 구현)
+- [ ] `ReminderGroup` 엔티티 (name, owner)
+- [ ] `GroupMember` 엔티티 (group, member, permission)
+- [ ] `GroupPermission` enum (READ, READ_WRITE)
+- [ ] `ReminderList`에 `group` FK 추가 (nullable)
+- [ ] 엔티티 단위 테스트
+
+### 7.2 Backend - 그룹 CRUD
+- [ ] `GroupService` / `DefaultGroupService`
+- [ ] `GroupController` - `POST/GET/PUT/DELETE /api/groups`
+- [ ] Group DTOs
+
+### 7.3 Backend - 그룹원 관리
+- [ ] 그룹원 초대 API (`POST /api/groups/{id}/members`)
+- [ ] 그룹원 강퇴 API (`DELETE /api/groups/{id}/members/{memberId}`)
+- [ ] 그룹원 권한 변경 API (`PATCH /api/groups/{id}/members/{memberId}/permission`)
+- [ ] 권한 검증 로직 (READ 권한 그룹원의 쓰기 요청 차단)
+
+### 7.4 Backend - 그룹 목록/리마인더
+- [ ] 그룹 목록 조회 API (`GET /api/groups/{id}/lists`)
+- [ ] 그룹 목록 생성/수정/삭제 시 권한 검증
+- [ ] 그룹 리마인더 CRUD 시 권한 검증
+
+### 7.5 Frontend
+- [ ] 그룹 생성/관리 UI
+- [ ] 그룹원 초대/강퇴/권한 설정 UI
+- [ ] 사이드바에 개인/그룹 목록 구분 표시
+- [ ] 그룹 리마인더 조회/편집 (권한에 따른 UI 분기)
+
+### 7.6 검증
+- [ ] 그룹 생성 → 대표가 목록/리마인더 CRUD 가능
+- [ ] 그룹원 초대 → 권한에 따라 조회/편집 가능
+- [ ] READ 권한 그룹원 → 쓰기 시도 시 403
+- [ ] 그룹원 강퇴 → 접근 불가 확인
