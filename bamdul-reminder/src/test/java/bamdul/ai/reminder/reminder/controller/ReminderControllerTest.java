@@ -6,6 +6,7 @@ import bamdul.ai.reminder.reminder.domain.Reminder;
 import bamdul.ai.reminder.reminder.repository.ReminderRepository;
 import bamdul.ai.reminder.reminderlist.domain.ReminderList;
 import bamdul.ai.reminder.reminderlist.repository.ReminderListRepository;
+import bamdul.ai.reminder.reminder.service.port.in.ReminderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -42,6 +45,9 @@ class ReminderControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private ReminderService reminderService;
 
     private Member member;
     private ReminderList list;
@@ -213,6 +219,121 @@ class ReminderControllerTest {
                     .andExpect(jsonPath("$[0].title", is("세 번째")))
                     .andExpect(jsonPath("$[1].title", is("첫 번째")))
                     .andExpect(jsonPath("$[2].title", is("두 번째")));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/today")
+    class FindTodayTest {
+
+        @Test
+        @DisplayName("오늘 마감인 미완료 리마인더를 조회한다")
+        void findToday() throws Exception {
+            reminderRepository.save(Reminder.builder().list(list).title("오늘 할 일")
+                    .dueDate(LocalDate.now().atTime(9, 0)).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("내일 할 일")
+                    .dueDate(LocalDate.now().plusDays(1).atTime(9, 0)).sortOrder(1).build());
+
+            mockMvc.perform(get("/api/reminders/today").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].title", is("오늘 할 일")));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/scheduled")
+    class FindScheduledTest {
+
+        @Test
+        @DisplayName("마감일이 있는 미완료 리마인더를 조회한다")
+        void findScheduled() throws Exception {
+            reminderRepository.save(Reminder.builder().list(list).title("예정됨")
+                    .dueDate(LocalDateTime.of(2026, 6, 1, 9, 0)).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("마감일 없음").sortOrder(1).build());
+
+            mockMvc.perform(get("/api/reminders/scheduled").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].title", is("예정됨")));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/all")
+    class FindAllSmartTest {
+
+        @Test
+        @DisplayName("미완료 리마인더를 모두 조회한다")
+        void findAll() throws Exception {
+            saveReminder("할 일 1", 0);
+            saveReminder("할 일 2", 1);
+            var completed = saveReminder("완료됨", 2);
+            reminderService.toggleComplete(completed.getId(), member.getId());
+
+            mockMvc.perform(get("/api/reminders/all").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(2)));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/flagged")
+    class FindFlaggedTest {
+
+        @Test
+        @DisplayName("깃발 표시된 미완료 리마인더를 조회한다")
+        void findFlagged() throws Exception {
+            reminderRepository.save(Reminder.builder().list(list).title("깃발")
+                    .flagged(true).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("일반").sortOrder(1).build());
+
+            mockMvc.perform(get("/api/reminders/flagged").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].title", is("깃발")));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/completed")
+    class FindCompletedTest {
+
+        @Test
+        @DisplayName("완료된 리마인더를 조회한다")
+        void findCompleted() throws Exception {
+            saveReminder("미완료", 0);
+            var completed = saveReminder("완료됨", 1);
+            reminderService.toggleComplete(completed.getId(), member.getId());
+
+            mockMvc.perform(get("/api/reminders/completed").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].title", is("완료됨")));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/reminders/counts")
+    class CountSmartListsTest {
+
+        @Test
+        @DisplayName("스마트 목록 카운트를 반환한다")
+        void counts() throws Exception {
+            reminderRepository.save(Reminder.builder().list(list).title("오늘")
+                    .dueDate(LocalDate.now().atTime(9, 0)).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("깃발")
+                    .flagged(true).sortOrder(1).build());
+            var completed = saveReminder("완료됨", 2);
+            reminderService.toggleComplete(completed.getId(), member.getId());
+
+            mockMvc.perform(get("/api/reminders/counts").with(authenticated()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.today", is(1)))
+                    .andExpect(jsonPath("$.scheduled", is(1)))
+                    .andExpect(jsonPath("$.all", is(2)))
+                    .andExpect(jsonPath("$.flagged", is(1)))
+                    .andExpect(jsonPath("$.completed", is(1)));
         }
     }
 }

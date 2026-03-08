@@ -1,7 +1,6 @@
-package bamdul.ai.reminder.reminderlist.domain;
+package bamdul.ai.reminder.group.domain;
 
 import bamdul.ai.reminder.auth.domain.Member;
-import bamdul.ai.reminder.group.domain.ReminderGroup;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,32 +18,21 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reminder_list")
+@Table(name = "reminder_group")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReminderList {
+public class ReminderGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private ReminderGroup group;
-
     @Column(nullable = false)
     private String name;
 
-    private String color;
-
-    private String icon;
-
-    @Column(nullable = false)
-    private Integer sortOrder = 0;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Member owner;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -53,27 +41,20 @@ public class ReminderList {
     private LocalDateTime updatedAt;
 
     @Builder
-    public ReminderList(Member member, ReminderGroup group, String name, String color, String icon, Integer sortOrder) {
+    public ReminderGroup(String name, Member owner) {
         var now = LocalDateTime.now();
-        this.member = member;
-        this.group = group;
         this.name = name;
-        this.color = color;
-        this.icon = icon;
-        this.sortOrder = sortOrder != null ? sortOrder : 0;
+        this.owner = owner;
         this.createdAt = now;
         this.updatedAt = now;
     }
 
-    public void update(String name, String color, String icon) {
+    public void update(String name) {
         this.name = name;
-        this.color = color;
-        this.icon = icon;
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-        this.updatedAt = LocalDateTime.now();
+    public boolean isOwner(Long memberId) {
+        return owner.getId().equals(memberId);
     }
 }

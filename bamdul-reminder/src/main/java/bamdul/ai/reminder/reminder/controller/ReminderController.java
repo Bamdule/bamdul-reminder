@@ -3,6 +3,7 @@ package bamdul.ai.reminder.reminder.controller;
 import bamdul.ai.reminder.reminder.service.dto.CreateReminderCommand;
 import bamdul.ai.reminder.reminder.service.dto.ReminderResult;
 import bamdul.ai.reminder.reminder.service.dto.ReorderReminderCommand;
+import bamdul.ai.reminder.reminder.service.dto.SmartListCountResult;
 import bamdul.ai.reminder.reminder.service.dto.UpdateReminderCommand;
 import bamdul.ai.reminder.reminder.service.port.in.ReminderService;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,41 @@ public class ReminderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reorder(@RequestBody ReorderReminderCommand command, @AuthenticationPrincipal Long memberId) {
         reminderService.reorder(command, memberId);
+    }
+
+    // Smart lists
+    @GetMapping("/api/reminders/today")
+    public List<ReminderResult> findToday(@AuthenticationPrincipal Long memberId) {
+        return reminderService.findToday(memberId);
+    }
+
+    @GetMapping("/api/reminders/scheduled")
+    public List<ReminderResult> findScheduled(@AuthenticationPrincipal Long memberId) {
+        return reminderService.findScheduled(memberId);
+    }
+
+    @GetMapping("/api/reminders/all")
+    public List<ReminderResult> findAll(@AuthenticationPrincipal Long memberId) {
+        return reminderService.findAll(memberId);
+    }
+
+    @GetMapping("/api/reminders/flagged")
+    public List<ReminderResult> findFlagged(@AuthenticationPrincipal Long memberId) {
+        return reminderService.findFlagged(memberId);
+    }
+
+    @GetMapping("/api/reminders/completed")
+    public List<ReminderResult> findCompleted(@AuthenticationPrincipal Long memberId) {
+        return reminderService.findCompleted(memberId);
+    }
+
+    @GetMapping("/api/reminders/counts")
+    public SmartListCountResult countSmartLists(@AuthenticationPrincipal Long memberId) {
+        return reminderService.countSmartLists(memberId);
+    }
+
+    @GetMapping("/api/reminders/search")
+    public List<ReminderResult> search(@RequestParam String q, @AuthenticationPrincipal Long memberId) {
+        return reminderService.search(q, memberId);
     }
 }

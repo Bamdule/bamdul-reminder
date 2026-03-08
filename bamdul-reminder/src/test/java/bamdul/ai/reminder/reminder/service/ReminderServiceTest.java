@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -248,6 +249,152 @@ class ReminderServiceTest {
             assertThat(result.get(0).title()).isEqualTo("세 번째");
             assertThat(result.get(1).title()).isEqualTo("첫 번째");
             assertThat(result.get(2).title()).isEqualTo("두 번째");
+        }
+    }
+
+    @Nested
+    @DisplayName("findAllByListId - 계층 구조")
+    class FindAllByListIdWithChildrenTest {
+
+        @Test
+        @DisplayName("부모 리마인더의 하위 리마인더를 함께 반환한다")
+        void findAllWithChildren() {
+            var parent = saveReminder("부모", 0);
+            reminderRepository.save(Reminder.builder()
+                    .list(list).parent(parent).title("하위 1").sortOrder(0).build());
+            reminderRepository.save(Reminder.builder()
+                    .list(list).parent(parent).title("하위 2").sortOrder(1).build());
+
+            var result = service.findAllByListId(list.getId(), member.getId());
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).children()).hasSize(2);
+            assertThat(result.get(0).children().get(0).title()).isEqualTo("하위 1");
+            assertThat(result.get(0).children().get(1).title()).isEqualTo("하위 2");
+        }
+    }
+
+    @Nested
+    @DisplayName("findToday")
+    class FindTodayTest {
+
+        @Test
+        @DisplayName("오늘 마감인 미완료 리마인더를 조회한다")
+        void findToday() {
+            LocalDateTime todayMorning = LocalDate.now().atTime(9, 0);
+            LocalDateTime tomorrow = LocalDate.now().plusDays(1).atTime(9, 0);
+            reminderRepository.save(Reminder.builder().list(list).title("오늘 할 일").dueDate(todayMorning).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("내일 할 일").dueDate(tomorrow).sortOrder(1).build());
+
+            var result = service.findToday(member.getId());
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).title()).isEqualTo("오늘 할 일");
+        }
+
+        @Test
+        @DisplayName("완료된 리마인더는 제외한다")
+        void excludeCompleted() {
+            var reminder = reminderRepository.save(Reminder.builder()
+                    .list(list).title("완료됨").dueDate(LocalDate.now().atTime(9, 0)).sortOrder(0).build());
+            service.toggleComplete(reminder.getId(), member.getId());
+
+            var result = service.findToday(member.getId());
+
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("findScheduled")
+    class FindScheduledTest {
+
+        @Test
+        @DisplayName("마감일이 있는 미완료 리마인더를 조회한다")
+        void findScheduled() {
+            reminderRepository.save(Reminder.builder().list(list).title("예정됨").dueDate(LocalDateTime.of(2026, 6, 1, 9, 0)).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("마감일 없음").sortOrder(1).build());
+
+            var result = service.findScheduled(member.getId());
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).title()).isEqualTo("예정됨");
+        }
+    }
+
+    @Nested
+    @DisplayName("findAll")
+    class FindAllTest {
+
+        @Test
+        @DisplayName("미완료 리마인더를 모두 조회한다")
+        void findAll() {
+            saveReminder("할 일 1", 0);
+            saveReminder("할 일 2", 1);
+            var completed = saveReminder("완료됨", 2);
+            service.toggleComplete(completed.getId(), member.getId());
+
+            var result = service.findAll(member.getId());
+
+            assertThat(result).hasSize(2);
+        }
+    }
+
+    @Nested
+    @DisplayName("findFlagged")
+    class FindFlaggedTest {
+
+        @Test
+        @DisplayName("깃발 표시된 미완료 리마인더를 조회한다")
+        void findFlagged() {
+            reminderRepository.save(Reminder.builder().list(list).title("깃발").flagged(true).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("일반").sortOrder(1).build());
+
+            var result = service.findFlagged(member.getId());
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).title()).isEqualTo("깃발");
+        }
+    }
+
+    @Nested
+    @DisplayName("findCompleted")
+    class FindCompletedTest {
+
+        @Test
+        @DisplayName("완료된 리마인더를 조회한다")
+        void findCompleted() {
+            saveReminder("미완료", 0);
+            var completed = saveReminder("완료됨", 1);
+            service.toggleComplete(completed.getId(), member.getId());
+
+            var result = service.findCompleted(member.getId());
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).title()).isEqualTo("완료됨");
+        }
+    }
+
+    @Nested
+    @DisplayName("countSmartLists")
+    class CountSmartListsTest {
+
+        @Test
+        @DisplayName("각 스마트 목록의 카운트를 반환한다")
+        void countSmartLists() {
+            reminderRepository.save(Reminder.builder().list(list).title("오늘").dueDate(LocalDate.now().atTime(9, 0)).sortOrder(0).build());
+            reminderRepository.save(Reminder.builder().list(list).title("예정").dueDate(LocalDateTime.of(2026, 12, 1, 9, 0)).sortOrder(1).build());
+            reminderRepository.save(Reminder.builder().list(list).title("깃발").flagged(true).sortOrder(2).build());
+            var completed = saveReminder("완료 예정", 3);
+            service.toggleComplete(completed.getId(), member.getId());
+
+            var result = service.countSmartLists(member.getId());
+
+            assertThat(result.today()).isEqualTo(1);
+            assertThat(result.scheduled()).isEqualTo(2);
+            assertThat(result.all()).isEqualTo(3);
+            assertThat(result.flagged()).isEqualTo(1);
+            assertThat(result.completed()).isEqualTo(1);
         }
     }
 }

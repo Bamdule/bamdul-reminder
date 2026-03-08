@@ -4,6 +4,7 @@ import bamdul.ai.reminder.reminder.domain.Priority;
 import bamdul.ai.reminder.reminder.domain.Reminder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ReminderResult(
         Long id,
@@ -18,7 +19,8 @@ public record ReminderResult(
         Boolean flagged,
         Integer sortOrder,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        List<ReminderResult> children
 ) {
     public static ReminderResult from(Reminder entity) {
         return new ReminderResult(
@@ -34,7 +36,27 @@ public record ReminderResult(
                 entity.getFlagged(),
                 entity.getSortOrder(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                entity.getUpdatedAt(),
+                List.of()
+        );
+    }
+
+    public static ReminderResult fromWithChildren(Reminder entity, List<ReminderResult> children) {
+        return new ReminderResult(
+                entity.getId(),
+                entity.getList().getId(),
+                entity.getParent() != null ? entity.getParent().getId() : null,
+                entity.getTitle(),
+                entity.getNotes(),
+                entity.getDueDate(),
+                entity.getCompleted(),
+                entity.getCompletedAt(),
+                entity.getPriority(),
+                entity.getFlagged(),
+                entity.getSortOrder(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                children
         );
     }
 }

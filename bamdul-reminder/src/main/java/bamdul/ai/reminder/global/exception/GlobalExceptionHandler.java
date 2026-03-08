@@ -1,6 +1,7 @@
 package bamdul.ai.reminder.global.exception;
 
 import bamdul.ai.reminder.auth.exception.DuplicateEmailException;
+import bamdul.ai.reminder.group.exception.GroupAccessDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,5 +25,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(GroupAccessDeniedException.class)
+    public ProblemDetail handleGroupAccessDenied(GroupAccessDeniedException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 }

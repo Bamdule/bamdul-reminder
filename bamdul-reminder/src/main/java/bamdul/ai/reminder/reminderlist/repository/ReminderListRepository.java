@@ -13,4 +13,6 @@ public interface ReminderListRepository extends JpaRepository<ReminderList, Long
     List<ReminderList> findAllByMemberIdOrderBySortOrderAsc(Long memberId);
 
     Optional<ReminderList> findByIdAndMemberId(Long id, Long memberId);
+
+    List<ReminderList> findAllByGroupIdOrderBySortOrderAsc(Long groupId);
 }

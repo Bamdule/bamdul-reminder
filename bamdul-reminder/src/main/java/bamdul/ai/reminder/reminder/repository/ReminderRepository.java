@@ -13,6 +13,8 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
 
     Optional<Reminder> findByIdAndListMemberId(Long id, Long memberId);
 
+    List<Reminder> findAllByParentIdOrderBySortOrderAsc(Long parentId);
+
     List<Reminder> findAllByListMemberIdAndCompletedFalseOrderBySortOrderAsc(Long memberId);
 
     List<Reminder> findAllByListMemberIdAndDueDateBetweenAndCompletedFalseOrderByDueDateAsc(
@@ -23,4 +25,6 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     List<Reminder> findAllByListMemberIdAndFlaggedTrueAndCompletedFalseOrderBySortOrderAsc(Long memberId);
 
     List<Reminder> findAllByListMemberIdAndCompletedTrueOrderByCompletedAtDesc(Long memberId);
+
+    List<Reminder> findAllByListMemberIdAndTitleContainingIgnoreCaseOrderBySortOrderAsc(Long memberId, String keyword);
 }

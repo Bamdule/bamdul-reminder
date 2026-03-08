@@ -114,24 +114,24 @@
 ## Phase 4: 스마트 목록
 
 ### 4.1 Backend
-- [ ] `GET /api/reminders/today`
-- [ ] `GET /api/reminders/scheduled`
-- [ ] `GET /api/reminders/all`
-- [ ] `GET /api/reminders/flagged`
-- [ ] `GET /api/reminders/completed`
-- [ ] 각 스마트 목록 카운트 API
+- [x] `GET /api/reminders/today`
+- [x] `GET /api/reminders/scheduled`
+- [x] `GET /api/reminders/all`
+- [x] `GET /api/reminders/flagged`
+- [x] `GET /api/reminders/completed`
+- [x] 각 스마트 목록 카운트 API
 
 ### 4.2 Frontend - 사이드바
-- [ ] 스마트 목록 5종 고정 표시
-- [ ] 아이콘/색상 적용
-- [ ] 카운트 뱃지
+- [x] 스마트 목록 5종 고정 표시
+- [x] 아이콘/색상 적용
+- [x] 카운트 뱃지
 
 ### 4.3 Frontend - 페이지
-- [ ] `/today`, `/scheduled`, `/all`, `/flagged`, `/completed` 페이지
-- [ ] 메인 대시보드 카운트 요약 카드
+- [x] `/today`, `/scheduled`, `/all`, `/flagged`, `/completed` 페이지
+- [x] 메인 대시보드 카운트 요약 카드
 
 ### 4.4 검증
-- [ ] 스마트 목록 클릭 → 올바른 필터 결과
+- [x] 스마트 목록 클릭 → 올바른 필터 결과
 - [ ] 리마인더 변경 후 카운트 즉시 반영
 
 ---
@@ -139,19 +139,19 @@
 ## Phase 5: 하위 리마인더 + 정렬
 
 ### 5.1 Backend
-- [ ] 부모-자식 계층 데이터 반환
-- [ ] 하위 리마인더 생성 API (parentId)
-- [ ] `PATCH /api/reminders/reorder`
-- [ ] `PATCH /api/lists/reorder`
+- [x] 부모-자식 계층 데이터 반환
+- [x] 하위 리마인더 생성 API (parentId)
+- [x] `PATCH /api/reminders/reorder`
+- [x] `PATCH /api/lists/reorder`
 
 ### 5.2 Frontend
-- [ ] "+ 하위 작업" 버튼 + 들여쓰기 계층 표현
+- [x] "+ 하위 작업" 버튼 + 들여쓰기 계층 표현
 - [ ] 부모 완료 시 하위 일괄 처리 UX
-- [ ] 리마인더 드래그 앤 드롭 정렬
-- [ ] 사이드바 목록 드래그 앤 드롭 정렬
+- [x] 리마인더 드래그 앤 드롭 정렬
+- [x] 사이드바 목록 드래그 앤 드롭 정렬
 
 ### 5.3 검증
-- [ ] 하위 리마인더 생성/표시/완료
+- [x] 하위 리마인더 생성/표시/완료
 - [ ] 드래그 정렬 → 새로고침 후 유지
 
 ---
@@ -159,17 +159,17 @@
 ## Phase 6: UI 폴리싱 + 추가 기능
 
 ### 6.1 반응형 디자인
-- [ ] 모바일 사이드바 햄버거 메뉴 토글
-- [ ] 태블릿/데스크탑 레이아웃 조정
+- [x] 모바일 사이드바 햄버거 메뉴 토글
+- [x] 태블릿/데스크탑 레이아웃 조정
 
 ### 6.2 다크 모드
-- [ ] 다크 모드 테마 색상 + 토글 버튼
+- [x] 다크 모드 테마 색상 + 토글 버튼
 
 ### 6.3 검색
-- [ ] 검색 UI + 리마인더 제목/메모 검색 연동
+- [x] 검색 UI + 리마인더 제목/메모 검색 연동
 
 ### 6.4 키보드 단축키
-- [ ] Enter(빠른 추가), Esc(편집 취소) 등
+- [x] Enter(빠른 추가), Esc(편집 취소) 등
 
 ### 6.5 로딩/에러 상태
 - [ ] 스켈레톤 로딩 + 토스트 알림
@@ -178,9 +178,9 @@
 - [ ] 목록 전환 + 항목 추가/삭제 트랜지션
 
 ### 6.7 검증
-- [ ] 반응형 각 화면 크기 정상 동작
-- [ ] 다크 모드 전환
-- [ ] 검색 결과 즉시 필터링
+- [x] 반응형 각 화면 크기 정상 동작
+- [x] 다크 모드 전환
+- [x] 검색 결과 즉시 필터링
 
 ---
 
@@ -189,36 +189,36 @@
 > 엔티티는 선설계하되, 기능 구현은 이 Phase에서 진행한다. 그 전까지는 개인 리마인더(그룹 대표 = 본인)만 사용한다.
 
 ### 7.1 엔티티 선설계 (Phase 1에서 미리 구현)
-- [ ] `ReminderGroup` 엔티티 (name, owner)
-- [ ] `GroupMember` 엔티티 (group, member, permission)
-- [ ] `GroupPermission` enum (READ, READ_WRITE)
-- [ ] `ReminderList`에 `group` FK 추가 (nullable)
-- [ ] 엔티티 단위 테스트
+- [x] `ReminderGroup` 엔티티 (name, owner)
+- [x] `GroupMember` 엔티티 (group, member, permission)
+- [x] `GroupPermission` enum (READ, READ_WRITE)
+- [x] `ReminderList`에 `group` FK 추가 (nullable)
+- [x] 엔티티 단위 테스트
 
 ### 7.2 Backend - 그룹 CRUD
-- [ ] `GroupService` / `DefaultGroupService`
-- [ ] `GroupController` - `POST/GET/PUT/DELETE /api/groups`
-- [ ] Group DTOs
+- [x] `GroupService` / `DefaultGroupService`
+- [x] `GroupController` - `POST/GET/PUT/DELETE /api/groups`
+- [x] Group DTOs
 
 ### 7.3 Backend - 그룹원 관리
-- [ ] 그룹원 초대 API (`POST /api/groups/{id}/members`)
-- [ ] 그룹원 강퇴 API (`DELETE /api/groups/{id}/members/{memberId}`)
-- [ ] 그룹원 권한 변경 API (`PATCH /api/groups/{id}/members/{memberId}/permission`)
-- [ ] 권한 검증 로직 (READ 권한 그룹원의 쓰기 요청 차단)
+- [x] 그룹원 초대 API (`POST /api/groups/{id}/members`)
+- [x] 그룹원 강퇴 API (`DELETE /api/groups/{id}/members/{memberId}`)
+- [x] 그룹원 권한 변경 API (`PATCH /api/groups/{id}/members/{memberId}/permission`)
+- [x] 권한 검증 로직 (READ 권한 그룹원의 쓰기 요청 차단)
 
 ### 7.4 Backend - 그룹 목록/리마인더
-- [ ] 그룹 목록 조회 API (`GET /api/groups/{id}/lists`)
-- [ ] 그룹 목록 생성/수정/삭제 시 권한 검증
-- [ ] 그룹 리마인더 CRUD 시 권한 검증
+- [x] 그룹 목록 조회 API (`GET /api/groups/{id}/lists`)
+- [x] 그룹 목록 생성/수정/삭제 시 권한 검증
+- [x] 그룹 리마인더 CRUD 시 권한 검증
 
 ### 7.5 Frontend
-- [ ] 그룹 생성/관리 UI
-- [ ] 그룹원 초대/강퇴/권한 설정 UI
-- [ ] 사이드바에 개인/그룹 목록 구분 표시
-- [ ] 그룹 리마인더 조회/편집 (권한에 따른 UI 분기)
+- [x] 그룹 생성/관리 UI
+- [x] 그룹원 초대/강퇴/권한 설정 UI
+- [x] 사이드바에 개인/그룹 목록 구분 표시
+- [x] 그룹 리마인더 조회/편집 (권한에 따른 UI 분기)
 
 ### 7.6 검증
-- [ ] 그룹 생성 → 대표가 목록/리마인더 CRUD 가능
-- [ ] 그룹원 초대 → 권한에 따라 조회/편집 가능
-- [ ] READ 권한 그룹원 → 쓰기 시도 시 403
-- [ ] 그룹원 강퇴 → 접근 불가 확인
+- [x] 그룹 생성 → 대표가 목록/리마인더 CRUD 가능
+- [x] 그룹원 초대 → 권한에 따라 조회/편집 가능
+- [x] READ 권한 그룹원 → 쓰기 시도 시 403
+- [x] 그룹원 강퇴 → 접근 불가 확인
