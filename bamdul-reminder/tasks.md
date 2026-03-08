@@ -25,52 +25,61 @@
 - [x] `ReminderListController` - `GET/POST/PUT/DELETE /api/lists`, `PATCH /api/lists/reorder`
 - [x] List DTOs (`CreateReminderListCommand`, `UpdateReminderListCommand`, `ReminderListResult`, `ReorderCommand`)
 
-### 1.4 리마인더 (reminder/ - 미구현)
-- [ ] `Reminder` 엔티티
-- [ ] `Priority` enum (NONE, LOW, MEDIUM, HIGH)
-- [ ] `ReminderRepository` (+ 커스텀 쿼리 메서드)
-- [ ] `ReminderService` / `DefaultReminderService` - 리마인더 CRUD + 완료 토글
-- [ ] `ReminderController` - `GET/POST /api/lists/{listId}/reminders`, `PUT/DELETE /api/reminders/{id}`, `PATCH /api/reminders/{id}/toggle`
-- [ ] Reminder DTOs
+### 1.4 리마인더 (reminder/)
+- [x] `Reminder` 엔티티
+- [x] `Priority` enum (NONE, LOW, MEDIUM, HIGH)
+- [x] `ReminderRepository` (+ 커스텀 쿼리 메서드)
+- [x] `ReminderService` / `DefaultReminderService` - 리마인더 CRUD + 완료 토글
+- [x] `ReminderController` - `GET/POST /api/lists/{listId}/reminders`, `PUT/DELETE /api/reminders/{id}`, `PATCH /api/reminders/{id}/toggle`
+- [x] Reminder DTOs
 
 ### 1.5 전역 (global/)
 - [x] `GlobalExceptionHandler`
 - [x] `ResourceNotFoundException`
 
-### 1.7 초기 데이터
-- [ ] `data.sql` 작성 (샘플 목록 2~3개 + 리마인더 5~10개)
-
-### 1.8 검증
-- [ ] curl로 목록 CRUD API 테스트
-- [ ] curl로 리마인더 CRUD API 테스트
-- [ ] H2 콘솔에서 데이터 확인
+### 1.6 검증
+- [x] 통합 테스트로 목록/리마인더/인증 CRUD API 검증 완료
 
 ---
 
-## Phase 2: Frontend 기본 구조 + 목록/리마인더 표시
+## Phase 2: Frontend 기본 구조 + 인증 UI + 목록/리마인더 표시
 
 ### 2.1 프로젝트 초기화
 - [ ] Next.js 프로젝트 생성 (`frontend/`, App Router, TypeScript, Tailwind CSS)
 - [ ] 기본 디렉토리 구조 생성 (`components/`, `lib/`, `types/`)
 
-### 2.2 타입 정의
-- [ ] `types/reminder.ts` - Reminder, ReminderList, Priority 타입
+### 2.2 인증 UI
+- [ ] `lib/auth.ts` - JWT 토큰 저장/조회/삭제 (localStorage), 인증 상태 관리
+- [ ] `app/login/page.tsx` - 로그인 페이지 (이메일, 비밀번호 입력)
+- [ ] `app/signup/page.tsx` - 회원가입 페이지 (이메일, 비밀번호, 이름 입력)
+- [ ] 인증 API 연동 (signup, login)
+- [ ] 로그인/회원가입 성공 시 → 리마인더 홈(`/`)으로 리다이렉트
+- [ ] 비로그인 상태에서 보호된 페이지 접근 시 → `/login`으로 리다이렉트
+- [ ] 401 응답 시 → 토큰 삭제 후 `/login`으로 리다이렉트
 
-### 2.3 API 클라이언트
-- [ ] `lib/api.ts` - fetch 래퍼 (baseURL, JSON 헤더, 에러 핸들링)
+### 2.3 타입 정의
+- [ ] `types/reminder.ts` - Reminder, ReminderList, Priority 타입
+- [ ] `types/auth.ts` - Member, AuthResult 타입
+
+### 2.4 API 클라이언트
+- [ ] `lib/api.ts` - fetch 래퍼 (baseURL, JSON 헤더, JWT 토큰 자동 포함, 401 핸들링)
+- [ ] 인증 API 함수 (signup, login)
 - [ ] 목록 API 함수 (getLists, createList, updateList, deleteList)
 - [ ] 리마인더 API 함수 (getReminders, createReminder, updateReminder, deleteReminder, toggleReminder)
 
-### 2.4 레이아웃
+### 2.5 레이아웃
 - [ ] `app/layout.tsx` - 루트 레이아웃 (2-패널: Sidebar + Main Content)
 - [ ] Sidebar 컴포넌트 - 사용자 목록 + 리마인더 개수 뱃지
 - [ ] 목록 선택 상태 관리
 
-### 2.5 리마인더 목록 표시
+### 2.6 리마인더 목록 표시
 - [ ] `app/lists/[id]/page.tsx` - 목록별 리마인더 표시
 - [ ] ReminderItem 컴포넌트 - 체크박스, 제목, 우선순위, 마감일
 
-### 2.6 검증
+### 2.7 검증
+- [ ] 비로그인 → `/login` 리다이렉트
+- [ ] 회원가입 → 자동 로그인 → 리마인더 홈(`/`) 이동
+- [ ] 로그인 → 리마인더 홈(`/`) 이동
 - [ ] 사이드바 목록 클릭 → 메인 영역에 리마인더 표시
 - [ ] 백엔드 API 연동 정상 동작
 
