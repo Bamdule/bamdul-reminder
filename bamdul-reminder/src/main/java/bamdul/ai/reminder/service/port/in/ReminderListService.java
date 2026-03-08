@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface ReminderListService {
 
-    List<ReminderListResult> findAll();
+    List<ReminderListResult> findAll(Long memberId);
 
-    ReminderListResult findById(Long id);
+    ReminderListResult findById(Long id, Long memberId);
 
-    ReminderListResult create(CreateReminderListCommand command);
+    ReminderListResult create(CreateReminderListCommand command, Long memberId);
 
-    ReminderListResult update(Long id, UpdateReminderListCommand command);
+    ReminderListResult update(Long id, UpdateReminderListCommand command, Long memberId);
 
-    void delete(Long id);
+    void delete(Long id, Long memberId);
 
-    void reorder(ReorderCommand command);
+    void reorder(ReorderCommand command, Long memberId);
 }

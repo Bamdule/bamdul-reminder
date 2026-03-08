@@ -2,9 +2,12 @@ package bamdul.ai.reminder.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,6 +26,10 @@ public class ReminderList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
     @Column(nullable = false)
     private String name;
 
@@ -40,8 +47,9 @@ public class ReminderList {
     private LocalDateTime updatedAt;
 
     @Builder
-    public ReminderList(String name, String color, String icon, Integer sortOrder) {
+    public ReminderList(Member member, String name, String color, String icon, Integer sortOrder) {
         var now = LocalDateTime.now();
+        this.member = member;
         this.name = name;
         this.color = color;
         this.icon = icon;
